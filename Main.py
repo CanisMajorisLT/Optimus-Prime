@@ -4,17 +4,18 @@ from bs4 import BeautifulSoup
 import sqlite3
 import datetime
 
-link = 'http://www.cvonline.lt/darbo-skelbimai/visi?sort=tp_id&dir=desc&page=1000'
+
 conn = sqlite3.connect("Database.db")
 
 # Takes furthest page link as argument and does magic
-def update_Ad_table_0(link):
+def update_Ad_table_0():
+    link_for_getting_number_of_pages = 'http://www.cvonline.lt/darbo-skelbimai/visi?sort=tp_id&dir=desc&page=1000'
     rss_link = "http://www.cvonline.lt/darbo-skelbimai/visi?sort=tp_id&dir=desc&type=rss&page=0"
 
     # Makes a list of all the Url's that are currently in DB and of all active (marked as such) Url's in DB
     list_of_links_in_DB, list_of_all_active_urls_in_DB = make_listoflinkinDB()
 
-    page = requests.get(link)
+    page = requests.get(link_for_getting_number_of_pages)
     soup = BeautifulSoup(page.text, 'lxml')
     looking_for_number = soup.find(id="pagination").find_all('a')[-1].get('href')
     number_of_pages = int(looking_for_number[looking_for_number.index('page=')+5:])
@@ -110,7 +111,7 @@ def make_listoflinkinDB():
 
     return list_ofurlsindb, list_ofactiveurls
 
-update_Ad_table_0(link)
+update_Ad_table_0()
 
 
 #####################################################
