@@ -86,6 +86,7 @@ def update_Ad_table_1(rss_link, number_ofpages, listoflinksinDB, listofactiveUrl
                 info_listofnewAds.append(tuple(temporary_list))
 
         print(number)
+
         # Update DB with info of all new URLs using a list containing data of all new URLs
         conn.executemany("INSERT INTO Ad_table VALUES (?,?,?,?,?,?,?,?,?,?,?)", info_listofnewAds)
         conn.commit()
