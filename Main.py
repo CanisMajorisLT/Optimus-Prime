@@ -29,15 +29,16 @@ def update_Ad_table_0():
 
 def update_Ad_table_1(rss_link, number_ofpages, listoflinksinDB, listofactiveUrls):
 
-    info_listofnewAds = []  # This is a container of all new URLs data, so that all data can be pushed to DB at once
     list_ofallUrls = []
+
 
     for number in range(number_ofpages+1):
         pagelink = rss_link[0:rss_link.index('page=')+5] + str(number)
-
+        info_listofnewAds = []  # This is a container of all new URLs data, so that all data can be pushed to DB at once
         page = requests.get(pagelink)
         soup = BeautifulSoup(page.text, 'lxml')
         one_page = soup.find_all('item')
+
 
         for JobAd in one_page:
             url = JobAd.find('guid').get_text()
@@ -84,6 +85,10 @@ def update_Ad_table_1(rss_link, number_ofpages, listoflinksinDB, listofactiveUrl
 
                 info_listofnewAds.append(tuple(temporary_list))
 
+        print(number)
+        # Update DB with info of all new URLs using a list containing data of all new URLs
+        conn.executemany("INSERT INTO Ad_table VALUES (?,?,?,?,?,?,?,?,?,?,?)", info_listofnewAds)
+        conn.commit()
 
     # Check if All active URLs from DB are still active in new parse, if not update DB table with current date
     for activeUrl in listofactiveUrls:
@@ -92,9 +97,7 @@ def update_Ad_table_1(rss_link, number_ofpages, listoflinksinDB, listofactiveUrl
             conn.execute("UPDATE Ad_table set DateExpired = ? WHERE url = ?", (str(datetime.date.today()), activeUrl))
             conn.commit()
 
-    # Update DB with info of all new URLs using a list containing data of all new URLs
-    conn.executemany("INSERT INTO Ad_table VALUES (?,?,?,?,?,?,?,?,?,?,?)", info_listofnewAds)
-    conn.commit()
+
 
 
 
